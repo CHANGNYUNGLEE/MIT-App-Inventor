@@ -1,0 +1,48 @@
+#include <Servo.h>
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+
+const char* ssid = "A30";
+const char* pass = "00000008";
+
+ESP8266WebServer server(80);
+Servo myservo;
+
+void setup(void){
+
+  Serial.begin(115200);
+  Serial.println("Connecting...");
+  WiFi.begin(ssid, pass);
+  while (WiFi.status() != WL_CONNECTED) {
+  delay(500);
+  Serial.print(".");
+}
+
+  Serial.println("");
+  Serial.print("연결중");
+  Serial.println(ssid);
+  Serial.print("IP주소");
+  Serial.println(WiFi.localIP());
+
+  server.on("/", [](){
+    
+    server.send(200, "text/html","<!DOCTYPE html> <html lang=\"ko\"></html> <head> <meta charset=\"utf-8\"> <style> .button { background-color: #ece909; border: none; color: white; padding: 60px 90px; text-align: center; text-decoration: none; display: inline-block; font-size: 60px; margin: 4px 2px; cursor: pointer; font-weight: bold; cursor: pointer; height: 100px; width: 200px; transition-duration: 0.2s; } </style> </head> <body> <centor> <h1>HTML 동작버튼</h1> <h2>41515078 이창녕</h2> <a href=\"/on\" class=\"button\">꼬르륵</a> </centor> </body> </html>");});
+  
+  server.on("/on", [](){
+
+    Serial.println("꼬르륵");
+    myservo.write(0);
+    delay(2000);
+
+    myservo.write(179);
+    server.send(200, "text/html","<!DOCTYPE html> <html lang=\"ko\"></html> <head> <meta charset=\"utf-8\"> <style> .button { background-color: #ece909; border: none; color: white; padding: 60px 90px; text-align: center; text-decoration: none; display: inline-block; font-size: 60px; margin: 4px 2px; cursor: pointer; font-weight: bold; cursor: pointer; height: 100px; width: 200px; transition-duration: 0.2s; } </style> </head> <body> <centor> <h1>HTML 동작버튼</h1> <h2>41515078 이창녕</h2> <a href=\"/on\" class=\"button\">꼬르륵</a> </centor> </body> </html>");});
+
+  server.begin();
+  Serial.println("HTTP 서버로 들어오세요");
+  myservo.attach(D4);   // Servo attached to D5 pin
+  myservo.write(0);
+}
+
+void loop(void){
+  server.handleClient();
+}
